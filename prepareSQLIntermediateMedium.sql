@@ -1,32 +1,5 @@
 /*
 	Author : lrasata
-	HackerRankChallenge - Weather Observation Station 5
-    Query the two cities in STATION with the shortest and longest CITY names, 
-    as well as their respective lengths (i.e.: number of characters in the name). 
-    If there is more than one smallest or largest city, 
-    choose the one that comes first when ordered alphabetically.
-*/
-
-select * 
-from 
-(
-    select city, length(city) as length_name
-    from station
-    order by length_name, city  asc
-) as t_min
-limit 1;
-
-select *
-from 
-(
-    select city, length(city) as length_name
-    from station
-    order by length_name desc, city asc
-) as t_max
-limit 1;
-
-/*
-	Author : lrasata
 	HackerRankChallenge - Binary Tree Nodes
 */
 
@@ -85,3 +58,50 @@ group by h.hacker_id, h.name
 having count(s.hacker_id) > 1
 order by count(s.hacker_id) desc, s.hacker_id asc;
 
+/*
+	Author : lrasata
+	HackerRankChallenge - Ollivander's Inventory
+*/
+
+select w.id, wp.age, w.coins_needed, w.power
+from Wands as w join Wands_Property as wp on w.code = wp.code
+where wp.is_evil = 0 
+    and w.coins_needed = (
+        select min(coins_needed)
+        from Wands as w1 join Wands_Property as wp1 on w1.code = wp1.code
+        where w1.power = w.power and wp1.age = wp.age
+    )
+order by w.power desc, wp.age desc;
+
+/*
+	Author : lrasata
+	HackerRankChallenge - Placements
+*/
+select S.Name
+from(
+    select Friends.ID as fid, Friend_ID, Salary
+    from Friends, Packages
+    where Friends.ID = Packages.ID
+) as A join Packages as P1 on A.Friend_ID = P1.ID
+       join Students as S on S.ID = A.fid 
+where A.Salary < P1.Salary
+order by P1.Salary asc;
+
+
+/*
+	Author : lrasata
+	HackerRankChallenge - Contest Leaderboard
+*/
+
+select h.hacker_id, h.name, t2.sum_score
+from(
+    select t1.hid, sum(max_score) as sum_score
+    from (
+        select hacker_id as hid, challenge_id as cid, max(score) as max_score
+        from Submissions as s
+        group by s.hacker_id, s.challenge_id
+    ) as t1
+    group by t1.hid
+) as t2 join Hackers as h on h.hacker_id = t2.hid
+where sum_score != 0
+order by sum_score desc, hacker_id asc;
